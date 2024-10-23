@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversión de Amperios a Voltios</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Conversión de Amperios a Voltios</h1>
+        <div class="form-group">
+            <label for="amperiosInput">Ingresa la cantidad en Amperios:</label>
+            <input type="number" class="form-control" id="amperiosInput" placeholder="Amperios" required>
+        </div>
+        <button id="convertButton" class="btn btn-primary btn-block">Convertir</button>
+        <h2 class="text-center mt-4">Resultado: <span id="resultado" class="text-success"></span></h2>
+    </div>
+
+    <script>
+        const model = tf.sequential();
+        model.add(tf.layers.inputLayer({
+            batchInputShape: [null, 1] // o inputShape: [1]
+        }));
+        model.add(tf.layers.dense({
+            units: 3,
+            activation: 'linear',
+        }));
+        model.add(tf.layers.dense({
+            units: 1,
+            activation: 'linear',
+        }));
+
+        // Cargar los pesos del modelo
+        async function loadModel() {
+            // Suponiendo que tienes un archivo model.json en la misma carpeta
+            model.loadWeights('model.json');
+        }
+
+        document.getElementById('convertButton').addEventListener('click', async () => {
+            const amperios = parseFloat(document.getElementById('amperiosInput').value);
+            const inputTensor = tf.tensor2d([[amperios]], [1, 1]);
+            const prediction = model.predict(inputTensor);
+            prediction.array().then(array => {
+                document.getElementById('resultado').innerText = array[0][0].toFixed(2) + ' Voltios';
+            });
+        });
+
+        // Cargar el modelo al iniciar la página
+        loadModel();
+    </script>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
